@@ -123,3 +123,69 @@ end
 % solution of the Maxwell equations.
 
 toc(tStart)
+
+%% Nonlinear Schrodinger Equation with Split-Step Method2
+
+%idu/dz-sgn(beta2)/2 d^2u/d(tau)^2 + N^2*¦u¦^2*u = 0
+
+clear all;
+
+%Specify input parameters
+distance = 10;%input(’Enter fiber length (in units of L_D) =’); %
+beta2 = -1;%input(’dispersion: 1 for normal -1 for anomalous’);%
+N = 10;%input(’Nonlinear parameter N =’); % Soliton order
+mshape = 0;%input(’m=0 for sech, m>0 for super-Gaussian =’);
+chirp0 = 0; % input pulse chirp (default value)
+
+%Simulation Parameters
+nt=2048; Tmax=32; %FFT ponts and window size
+step_num = round(20*distance*N^2); %No. of z steps to
+deltaz = distance/step_num; %Step size in z
+dtau = 2*Tmax/nt; % Step size in tau
+
+%tau and omega arrays
+tau = (-nt/2:nt/2-1)*dtau; % temporal grid
+omega = (pi/Tmax)*[(0:nt/2-1) (-nt/2:-1)]; %frequency grid
+
+if mshape==0
+    uu = sech(tau).*exp(-0.5i*chirp0*tau.^2);
+else
+    uu = exp(-0.5*(1+1i*chirp0).*tau.^2);
+end
+
+temp= fftshift(ifft(uu)).*(nt*dtau)/sqrt(2*pi); %spectrum
+figure; subplot(2,1,1);
+plot(tau, abs(uu).^2,’--k’); hold on;
+axis([-5 5 0 inf]);
+xlabel(’Normalized Time’);
+ylabel(’Normalized Power’);
+subplot(2,1,2);
+plot(fftshift(omega)/(2*pi), abs(temp).^2, ’--k’); hold on;
+axis([-5 5 0 inf]);
+xlabel(’Normalized Freq’);
+ylabel(’Spectral Power’);
+
+%---storde dispersive shifts to speed up the code
+dispersion = exp(i*0.5*beta2*omega.^2*deltaz); %phase factor
+hhz = 1i*N^2*deltaz; %nonlonear phase factor
+
+% Main Loop
+%Scheme: 1/2N-> D -> 1/2N first half step nonlinear
+temp = uu.*exp(abs(uu).^2.*hhz/2);
+
+for n=1:step_num
+    f_temp=ifft(temp).*dispersion;
+    uu=fft(f_temp);
+    temp = uu.*exp(abs(uu).^2.*hhz);
+end
+
+uu = temp.*exp(-abs(uu).^2.*hhz/2); %final field
+temp = fftshift(ifft(uu)).*(nt*dtau)/sqrt(2*pi); %final spectrum
+% End of main loop
+
+% Plot output pulse shape and spectrum
+hold on
+subplot(2,1,1)
+plot(tau,abs(uu).^2,’--r’);
+subplot(2,1,2)
+plot(fftshift(omega)/(2*pi),abs(temp).^2,’--r’);
