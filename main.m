@@ -131,10 +131,10 @@ toc(tStart)
 clear all;
 
 %Specify input parameters
-distance = 10;%input(’Enter fiber length (in units of L_D) =’); %
-beta2 = -1;%input(’dispersion: 1 for normal -1 for anomalous’);%
-N = 10;%input(’Nonlinear parameter N =’); % Soliton order
-mshape = 0;%input(’m=0 for sech, m>0 for super-Gaussian =’);
+distance = 10;%input('Enter fiber length (in units of L_D) ='); %
+beta2 = -1;%input('dispersion: 1 for normal -1 for anomalous');%
+N = 10;%input('Nonlinear parameter N ='); % Soliton order
+mshape = 0;%input('m=0 for sech, m>0 for super-Gaussian =');
 chirp0 = 0; % input pulse chirp (default value)
 
 %Simulation Parameters
@@ -155,15 +155,15 @@ end
 
 temp= fftshift(ifft(uu)).*(nt*dtau)/sqrt(2*pi); %spectrum
 figure; subplot(2,1,1);
-plot(tau, abs(uu).^2,’--k’); hold on;
+plot(tau, abs(uu).^2,'--k'); hold on;
 axis([-5 5 0 inf]);
-xlabel(’Normalized Time’);
-ylabel(’Normalized Power’);
+xlabel('Normalized Time');
+ylabel('Normalized Power');
 subplot(2,1,2);
-plot(fftshift(omega)/(2*pi), abs(temp).^2, ’--k’); hold on;
+plot(fftshift(omega)/(2*pi), abs(temp).^2, '--k'); hold on;
 axis([-5 5 0 inf]);
-xlabel(’Normalized Freq’);
-ylabel(’Spectral Power’);
+xlabel('Normalized Freq');
+ylabel('Spectral Power');
 
 %---storde dispersive shifts to speed up the code
 dispersion = exp(i*0.5*beta2*omega.^2*deltaz); %phase factor
@@ -186,6 +186,6 @@ temp = fftshift(ifft(uu)).*(nt*dtau)/sqrt(2*pi); %final spectrum
 % Plot output pulse shape and spectrum
 hold on
 subplot(2,1,1)
-plot(tau,abs(uu).^2,’--r’);
+plot(tau,abs(uu).^2,'--r');
 subplot(2,1,2)
-plot(fftshift(omega)/(2*pi),abs(temp).^2,’--r’);
+plot(fftshift(omega)/(2*pi),abs(temp).^2,'--r');
